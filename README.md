@@ -10,5 +10,5 @@ This utility retrieves transit information which corresponds to specific stop ID
 * -L/-l/--lines \[StopID\]: display all transit options corresponding to StopID number.
 * -S/-s/--schedule \[StopID\]: display full schedule for all transit options corresponding to StopID number.
 * --help: display help page showing all option usage.
-## Notes
 ## License
+This project uses the MIT License.

@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Simple script that gets next TriMet stop arrival times.
+
+url="https://trimet.org/ride/stop_schedule.html?stop_id="
+
+function show_lines_by_stopID () {
+    stop_info=$(curl -s "$url$1")
+    if [[ $(echo $stop_info | grep -o "scheduletimes") != "scheduletimes" ]]; then
+        echo "Error! Invalid stop ID \"$1\"."
+        return 1
+    fi
+    echo "Transit options for stop id \"$1\":"
+    stop_info=$(echo $stop_info | grep -o '<ul class="sortbytime">.* </ul> </div> ' | sed 's/\(<\/i><\/li>\)/#/g' |sed 's/<[^>]*>//g')
+    echo "$stop_info" | sed -e "s/\([0-9]*:\)/\n\1/g" -e "s/\n\([0-9]*:\)/\1/1" -e "s/[ap]m /#/g" | cut -d'#' -f2 | sort | uniq
+    echo
+    return 0
+}
+
+function show_sched_by_stopID () {
+    stop_info=$(curl -s "$url$1")
+    if [[ $(echo $stop_info | grep -o "scheduletimes") != "scheduletimes" ]]; then
+        echo "Error! No schedule found for stop ID \"$1\"."
+        return 1
+    fi
+    echo "Schedule for stop id \"$1\"(All Lines):"
+    stop_info=$(echo $stop_info | grep -o '<ul class="sortbytime">.* </ul> </div> ' | sed 's/\(<\/i><\/li>\)/#/g' |sed 's/<[^>]*>//g')
+    echo $stop_info | sed 's/# / \n/g' | tr "#" " "
+    return 0
+}
+
+function show_alerts_by_stopID () {
+    stop_info=$(curl -s "$url$1")
+    if [[ $(echo $stop_info | grep -o "id=\"alerts\"") != "id=\"alerts\"" ]]; then
+        echo "Stop \"$1\" has lines with active alerts."
+        return 1
+    fi
+    echo "Line alerts for stop ID \"$1\":"
+    stop_info=$(echo $stop_info | grep -o '<div id="alerts">.*</p> </div>' | sed -e 's/<b>/#/g' -e 's/>More</></g' -e 's/<[^>]*>//g' )
+    echo $stop_info | sed -e 's/\&amp\;/\&/g' -e 's/#/\n/g'
+    return 0
+}
+
+if [[ $# < 2 ]]; then
+    echo "Error! Improper usage. Not enough parameters"
+    exit 1
+fi
+
+while [ -n "$1" ]; do
+case "$1" in
+    -L | -l | --lines )
+        shift; show_lines_by_stopID $1
+    ;;
+    -S | -s | --schedule )
+        shift; show_sched_by_stopID $1
+    ;;
+    -A | -a | --alerts )
+        shift; show_alerts_by_stopID $1
+    ;;
+    * )
+        echo "Error! Invalid option. Type trimet --help for list of valid options." ; exit 1
+    ;;
+esac
+shift
+done
+
+exit 0

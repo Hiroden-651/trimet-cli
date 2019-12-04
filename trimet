@@ -41,9 +41,13 @@ function show_alerts_by_stopID () {
     return 0
 }
 
+if [[ $1 == "--help" ]]; then
+    cat help
+    exit 0
+fi
+
 if [[ $# < 2 ]]; then
-    echo "Error! Improper usage. Not enough parameters"
-    exit 1
+    echo "Error! Improper usage. Type trimet --help for usage and options." ; exit 1
 fi
 
 while [ -n "$1" ]; do
@@ -63,5 +67,4 @@ case "$1" in
 esac
 shift
 done
-
 exit 0

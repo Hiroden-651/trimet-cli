@@ -1,0 +1,22 @@
+"TriMet Command Line Utility" by Bradley Maness
+
+Description:
+    This utility retrieves information from the TriMet website using stop ID numbers and displays relevant information
+    for that stop.
+
+Usage:
+    trimet --help
+    trimet [-option] [StopID]
+    trimet [-option] [StopID] ... [-option] [StopID]
+
+    StopID is an integer value that is
+
+Options
+    --help: Opens this document.
+
+    -A / -a / --alerts [StopID]: Display alerts for stop with associated StopID.
+
+    -L / -l / --lines [StopID]: Display all transit options(all possible trains, buses, etc) for stop with associated StopID.
+
+    -S / -s / --schedule [StopID]: Display all arrival times for all transit options for stop associated with StopID.
+
